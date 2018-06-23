@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,19 +22,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import com.hackathon.obs.Dao.LicitacaoDao;
 import com.hackathon.obs.entidades.Licitacao;
+import com.hackathon.obs.repository.LicitacaoRepository;
 import com.hackhaton.obs.seguranca.JWTUtil;
 
 @RestController
 @RequestMapping("licitacoes")
 public class LicitacaoController {
 
-	private LicitacaoDao dao;
+	private LicitacaoRepository licitacaoRepository;
 
 	@Autowired
-	public LicitacaoController(LicitacaoDao dao) {
-		this.dao = dao;
+	public LicitacaoController(LicitacaoRepository licitacaoRepository) {
+		this.licitacaoRepository = licitacaoRepository;
 	}
 
 	@GetMapping
@@ -45,7 +43,7 @@ public class LicitacaoController {
 	public ResponseEntity<?> listar(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		if (JWTUtil.verificaToken(request, response)) {
 
-			List<Licitacao> list = dao.listar();
+			List<Licitacao> list = licitacaoRepository.findAll();
 			return ResponseEntity.ok(list);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -58,7 +56,7 @@ public class LicitacaoController {
 		if (JWTUtil.verificaToken(request, response)) {
 
 			try {
-				dao.salvar(l);
+				licitacaoRepository.save(l);
 				return ResponseEntity.created(URI.create("licitacoes/" + l.getId())).build();
 			} catch (Exception e) {
 				return new ResponseEntity<>("Confira se os campos foram preenchidos corretamente",
@@ -76,7 +74,7 @@ public class LicitacaoController {
 		if (JWTUtil.verificaToken(request, response)) {
 
 			try {
-				dao.removerPeloId(id);
+				licitacaoRepository.deleteById(id);
 				return new ResponseEntity<>(HttpStatus.OK);
 			} catch (NullPointerException e) {
 				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -91,7 +89,7 @@ public class LicitacaoController {
 			HttpServletResponse response) throws IOException {
 
 		if (JWTUtil.verificaToken(request, response)) {
-			Licitacao licitacao = dao.buscarPeloId(id);
+			Licitacao licitacao = licitacaoRepository.getOne(id);
 			if (licitacao == null) {
 				return ResponseEntity.notFound().build();
 			}
@@ -109,14 +107,13 @@ public class LicitacaoController {
 			throws IllegalAccessException, InvocationTargetException, IOException {
 
 		if (JWTUtil.verificaToken(request, response)) {
-			Licitacao licitacaoEncontrada = dao.buscarPeloId(id);
-			BeanUtils.copyProperties(licitacaoEncontrada, licitacao);
-			dao.salvar(licitacaoEncontrada);
+			Licitacao licitacaoEncontrada = licitacaoRepository.getOne(id);
 			if (licitacaoEncontrada == null) {
 				return new ResponseEntity<>("Usuário passado não encontrado", HttpStatus.NOT_FOUND);
 			}
 
-			dao.salvar(licitacaoEncontrada);
+			BeanUtils.copyProperties(licitacaoEncontrada, licitacao);
+			licitacaoRepository.save(licitacaoEncontrada);
 			return new ResponseEntity<>(licitacao, HttpStatus.OK);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

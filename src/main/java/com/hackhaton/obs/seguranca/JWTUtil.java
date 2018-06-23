@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hackathon.obs.entidades.CredenciaisUsuarios;
 import com.hackathon.obs.entidades.Usuario;
 
 import io.jsonwebtoken.Claims;
@@ -20,7 +21,7 @@ public abstract class JWTUtil {
 	public static final String HEADER_STRING = "Authorization";
 	private static String key = "SECRET_TOKEN";
 
-	static Usuario credentials = new Usuario();
+	static CredenciaisUsuarios credentials = new CredenciaisUsuarios();
 	public static final String TOKEN_HEADER = "Authentication";
 
 	public static String create(String subject) {

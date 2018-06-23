@@ -1,8 +1,6 @@
 package com.hackathon.obs.entidades;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,9 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
-public class Licitacao implements Serializable {
-	private static final long serialVersionUID = 1L;
+//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class Licitacao {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,11 +3,9 @@ package com.hackathon.obs.controller;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,20 +17,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.hackathon.obs.Dao.TipoHistoricoDao;
 import com.hackathon.obs.entidades.TipoHistorico;
+import com.hackathon.obs.repository.TipoHistoricoRepository;
 import com.hackhaton.obs.seguranca.JWTUtil;
 
 @RestController
 @RequestMapping("tipohistorico")
 public class TipoHistoricoController {
 
-	private TipoHistoricoDao dao;
+	private TipoHistoricoRepository tipoHistoricoRepository;
 
 	@Autowired
-	public TipoHistoricoController(TipoHistoricoDao dao) {
-		this.dao = dao;
+	public TipoHistoricoController(TipoHistoricoRepository tipoHistoricoRepository) {
+		this.tipoHistoricoRepository = tipoHistoricoRepository;
 	}
 
 	@GetMapping
@@ -40,7 +37,7 @@ public class TipoHistoricoController {
 	@ResponseStatus(code = HttpStatus.OK)
 	public ResponseEntity<?> listarStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		if (JWTUtil.verificaToken(request, response)) {
-			List<TipoHistorico> list = dao.listar();
+			List<TipoHistorico> list = tipoHistoricoRepository.findAll();
 			return ResponseEntity.ok(list);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -51,7 +48,7 @@ public class TipoHistoricoController {
 	public ResponseEntity<?> salvar(@Valid @RequestBody TipoHistorico uni, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		if (JWTUtil.verificaToken(request, response)) {
-			uni = dao.salvar(uni);
+			uni = tipoHistoricoRepository.save(uni);
 			return ResponseEntity.created(URI.create("tipohistorico/" + uni.getId())).build();
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

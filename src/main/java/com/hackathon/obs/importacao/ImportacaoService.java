@@ -4,20 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.hackathon.obs.Dao.ImportacaoDao;
 import com.hackathon.obs.entidades.Importacao;
 import com.hackathon.obs.entidades.Usuario;
+import com.hackathon.obs.repository.ImportacaoRepository;
 
 @Service
 public class ImportacaoService {
 
-	private ImportacaoDao importacaoDao;
+
+	private ImportacaoRepository importacaoRepository;
 
 	@Autowired
-	public ImportacaoService(ImportacaoDao dao) {
-		this.importacaoDao = dao;
+	public ImportacaoService(ImportacaoRepository importacaoRepository) {
+		this.importacaoRepository = importacaoRepository;
 	}
 
 	public void importar(String descricao, Usuario user, File arquivos)
@@ -30,7 +29,7 @@ public class ImportacaoService {
 			File file = new File(System.getProperty("user.home") + File.separator + "ArquivosImportados"
 					+ File.separator +  arquivos.getAbsolutePath());
 			imp.setLicitacao(file);
-			importacaoDao.salvar(imp);
+			importacaoRepository.save(imp);
 
 		} catch (Exception e) {
 			e.printStackTrace();

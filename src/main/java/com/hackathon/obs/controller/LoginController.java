@@ -10,19 +10,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.hackathon.obs.Dao.UsuarioDao;
+
+import com.hackathon.obs.entidades.CredenciaisUsuarios;
 import com.hackathon.obs.entidades.Usuario;
+import com.hackathon.obs.repository.UsuarioRepository;
 import com.hackhaton.obs.seguranca.JWTUtil;
 
 @RestController
 @RequestMapping("login")
 public class LoginController {
 
-	private UsuarioDao dao;
+	private UsuarioRepository usuarioRepository;
 
 	@Autowired
-	public LoginController(UsuarioDao dao) {
-		this.dao = dao;
+	public LoginController(UsuarioRepository usuarioRepository) {
+		this.usuarioRepository = usuarioRepository;
 	}
 
 	@CrossOrigin
@@ -30,12 +32,13 @@ public class LoginController {
 	public ResponseEntity<?> efetuarLogin(@RequestBody Usuario usuario, HttpServletResponse response) {
 		try {
 
-			Usuario usuarioModel = this.dao.buscarPorEmaileSenha(usuario.getEmail(), usuario.getSenha());
+			Usuario usuarioModel = this.usuarioRepository.findByEmailAndSenha(usuario.getEmail(), usuario.getSenha());
 			if (usuarioModel == null) {
 				return ResponseEntity.notFound().build();
 			}
 
 			@SuppressWarnings("unused")
+			// Usa Spring Security pra isso
 			String token = JWTUtil.create(usuario.getEmail());
 			usuarioModel.setEmail(usuario.getEmail());
 			usuarioModel.setNome(usuario.getNome());
